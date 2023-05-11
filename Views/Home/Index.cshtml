@@ -3,6 +3,24 @@
     @model List<Items>
 }
 <style>
+    #item-type {
+        padding: 8px 20px;
+        font-size: 16px;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+        background-color: white;
+        color: #333;
+        appearance: auto; /* this removes the default arrow */
+        -webkit-appearance: none; /* for Safari */
+        -moz-appearance: none; /* for Firefox */
+    }
+
+        #item-type:focus {
+            outline: none;
+            border-color: #4CAF50;
+            box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.2);
+        }
+
     .row {
         display: flex;
         align-items: center;
@@ -40,6 +58,27 @@
 
     tr:nth-child(even) {
         background-color: #f2f2f2;
+    }
+
+    button {
+       float:right;
+        background-color: #4CAF50; /* set the background color */
+        border: none; /* remove the border */
+        color: white; /* set the font color */
+        padding: 15px 32px; /* set the padding */
+        text-align: center; /* center the text */
+        text-decoration: none; /* remove any underline */
+        display: inline-block; /* set the button display as inline-block */
+        font-size: 16px; /* set the font size */
+        margin: 4px 2px; /* add some margin */
+        cursor: pointer; /* set the cursor style */
+        border-radius: 10px; /* round the corners */
+        transition-duration: 0.4s; /* add a smooth transition effect */
+    }
+
+    button:hover {
+        background-color: #3e8e41; /* change the background color on hover */
+        color: white; /* change the font color on hover */
     }
 </style>
 
@@ -88,7 +127,7 @@
         </tr>
     </tfoot>
 </table>
-<button id="printbtn" >Add Bill</button>
+<button id="printbtn" class="button" >Add Bill</button>
 
 @section scripts {
     <script src="https://code.jquery.com/jquery-3.6.4.min.js" integrity="sha256-oP6HI9z1XaZNBrJURtCoUT5SUnxFr8s3BzRl+cbzUq8=" crossorigin="anonymous"></script>
@@ -149,7 +188,7 @@
             form.append('updateQuantityRequest', JSON.stringify(updateQuantityRequest));
            
             const xhr = new XMLHttpRequest();
-            xhr.open('PUT', '/Home/UpdateQuantity');
+            xhr.open('PATCH', '/Home/UpdateQuantity');
             debugger
            await xhr.addEventListener('load', () => {
                 if (xhr.status === 200) {
@@ -226,10 +265,5 @@
         for (var i = 0; i < quantityInputs.length; i++) {
             quantityInputs[i].addEventListener('change', calculateTotals);
         }
-      
-
-     
-
-
     </script>
 }

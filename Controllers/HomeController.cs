@@ -20,8 +20,6 @@ namespace ConsumeInventaory.Controllers
         {
             client = new HttpClient();
             client.BaseAddress = baseAddreess;
-
-
             _logger = logger;
         }
 
@@ -37,7 +35,7 @@ namespace ConsumeInventaory.Controllers
                 Console.WriteLine(items.ToString());
 
             }
-
+            
             return View(items);
         }
 
@@ -73,7 +71,7 @@ namespace ConsumeInventaory.Controllers
 
 
         }
-        [HttpPut]
+        [HttpPatch]
         public async Task UpdateQuantity(string updateQuantityRequest)
         {
             List<UpdateQuantity> quantitiesList = JsonConvert.DeserializeObject<List<UpdateQuantity>>(updateQuantityRequest);
@@ -84,7 +82,7 @@ namespace ConsumeInventaory.Controllers
             var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
 
             //client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("*/*"));
-            var response = await client.PutAsync(client.BaseAddress , content);
+            var response = await client.PatchAsync(client.BaseAddress , content);
             if (response.IsSuccessStatusCode)
             {
                 Console.WriteLine(response.Content);
