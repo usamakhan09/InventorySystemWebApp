@@ -1,0 +1,235 @@
+﻿
+@{
+    @model List<Items>
+}
+<style>
+    .row {
+        display: flex;
+        align-items: center;
+    }
+
+    input, select {
+        margin-right: 10px;
+    }
+
+    .row-total {
+        margin-right: 10px;
+        font-weight: bold;
+    }
+
+    .remove-row {
+        margin-left: 10px;
+    }
+
+    table {
+        font-family: Arial, sans-serif;
+        border-collapse: collapse;
+        width: 100%;
+    }
+
+    th, td {
+        text-align: left;
+        padding: 8px;
+        border: 1px solid #ddd;
+    }
+
+    th {
+        background-color: #4CAF50;
+        color: white;
+    }
+
+    tr:nth-child(even) {
+        background-color: #f2f2f2;
+    }
+</style>
+
+<select id="item-type">
+    <option value="">select</option>
+    <option value="Electrical">Electrical</option>
+    <option value="Sanitary">Sanitary</option>
+    <option value="Hardware">Hardware</option>
+</select>
+
+<table>
+    <thead>
+        <tr>
+            <th>Sno</th>
+            <th>Price $</th>
+            <th>Item Name</th>
+            
+            <th>Quantity</th>
+            <th>Total</th>
+        </tr>
+    </thead>
+    <tbody>
+        @for (int i = 0; i < Model.Count; i++)
+        {
+            <tr>
+                <td>@(i + 1)</td>
+                <td>@Model[i].Price</td>
+                <td class="getName">@Model[i].ItemsName</td>
+                
+                <td>
+                    <input class="myquantity" type="number" name="quantity[]" placeholder="Quantity" data-price="@Model[i].Price" data-index="@i" />
+                </td>
+                <td>
+                    <span class="mytotal" data-index="@i"></span>
+                </td>
+            </tr>
+        }
+    </tbody>
+    <tfoot>
+        <tr>
+            <td colspan="3"></td>
+            <td>Grand Total:</td>
+            <td>
+                <span id="totalAmount"></span>
+            </td>
+        </tr>
+    </tfoot>
+</table>
+<button id="printbtn" >Add Bill</button>
+
+@section scripts {
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js" integrity="sha256-oP6HI9z1XaZNBrJURtCoUT5SUnxFr8s3BzRl+cbzUq8=" crossorigin="anonymous"></script>
+
+    <script>
+     
+
+        var quantityInputs = document.querySelectorAll('.myquantity');
+        var getName = document.querySelectorAll(".getName");
+        var totalSpans = document.querySelectorAll('.mytotal');
+        var grandTotalSpan = document.querySelector('#totalAmount');
+        var printBillBtn=document.querySelector('#printbtn')
+        var prices = [];
+        var quantities = [];
+        var itemsToUpdate = [];
+
+        //$(document).ready(function () {
+        //    $("#printbtn").click(function () {
+        //        var updateQuantityRequest = [];
+        //        for (var i = 0; i < itemsToUpdate.length; i++) {
+
+        //            updateQuantityRequest.push(itemsToUpdate[i]);
+        //        }
+        //        const name = prompt("Please enter your name:");
+        //        const amount = parseInt(grandTotalSpan.textContent);
+        //        //var data = {
+        //        //     updateQuantityRequest
+        //        //};
+        //        debugger
+
+        //        $.ajax({
+        //            type: "PATCH",
+        //            dataType: 'json',
+        //            contentType: 'application/json',
+        //            data: {
+        //                "updateQuantityRequest": JSON.stringify(updateQuantityRequest)
+        //            },
+        //            url: "/Home/UpdateQuantity",
+                    
+        //            success: function (response) {
+        //                alert("Message sent successfully.");
+        //            },
+        //            error: function (xhr, status, error) {
+        //                alert("Error sending message: " + error);
+        //            }
+        //        });
+        //    });
+        //});
+        printBillBtn.addEventListener('click', async () => {
+            var updateQuantityRequest = [];
+            for (var i = 0; i < itemsToUpdate.length; i++) {
+
+                updateQuantityRequest.push(itemsToUpdate[i]);
+            }
+          
+            const form = new FormData();
+
+            form.append('updateQuantityRequest', JSON.stringify(updateQuantityRequest));
+           
+            const xhr = new XMLHttpRequest();
+            xhr.open('PUT', '/Home/UpdateQuantity');
+            debugger
+           await xhr.addEventListener('load', () => {
+                if (xhr.status === 200) {
+                    //debugger           
+                    
+                    window.location.href = "/Home";
+                } else {
+                  
+                    console.error('Error: ' + xhr.statusText);
+                }
+            });
+
+            await updateQuantity2();
+            await xhr.send(form);
+
+        });
+        async function updateQuantity2(){
+
+            const name = prompt("Please enter your name:");
+            const amount = parseInt(grandTotalSpan.textContent);
+            const form = new FormData();
+            //form.append('updateQuantityRequest', updateQuantityRequest);
+            form.append('customerName', name);
+            form.append('totalAmount', amount);
+            debugger
+            const xhr = new XMLHttpRequest();
+            xhr.open('POST', '/Home/Addbill');
+            await xhr.addEventListener('load', () => {
+                if (xhr.status === 200) {
+                  
+                    window.location.href = '/Home/Thansks';
+                } else {
+                    console.error('Error: ' + xhr.statusText);
+                }
+            });
+            xhr.send(form);
+            
+          
+        }
+        // initialize prices and quantities arrays
+        for (var i = 0; i < quantityInputs.length; i++) {
+            var price = parseFloat(quantityInputs[i].getAttribute('data-price'));
+            var quantity = 0;
+            prices.push(price);
+            quantities.push(quantity);
+        }
+        document.getElementById("item-type").addEventListener("change", function () {
+            var selectedType = this.value;
+            window.location.href = "/Home/Index?selectedType=" + selectedType;
+        });
+        // calculate and update row total and grand total 
+        async function calculateTotals() {
+            var grandTotal = 0;
+            for (var i = 0; i < quantityInputs.length; i++) {
+                var quantity = parseInt(quantityInputs[i].value);
+                var total = quantity * prices[i];
+                quantities[i] = quantity;
+                totalSpans[i].innerHTML = total.toFixed(2);
+                grandTotal += total;
+                //        debugger
+                // add item to the itemsToUpdate array
+                var itemName = document.querySelectorAll('.myquantity')[i].parentElement.previousElementSibling.innerHTML;
+                var item = {
+                    "itemsName": itemName,
+                    "itemsQuantity": quantity
+                };
+                itemsToUpdate[i] = item;
+            }
+
+            grandTotalSpan.innerHTML = grandTotal.toFixed(2);
+        }
+
+        // attach event listener to quantity input
+        for (var i = 0; i < quantityInputs.length; i++) {
+            quantityInputs[i].addEventListener('change', calculateTotals);
+        }
+      
+
+     
+
+
+    </script>
+}
