@@ -4,22 +4,27 @@
 }
 <style>
     #item-type {
+        margin:5px auto;
         padding: 8px 20px;
         font-size: 16px;
         border-radius: 5px;
         border: 1px solid #ccc;
-        background-color: white;
-        color: #333;
-        appearance: auto; /* this removes the default arrow */
-        -webkit-appearance: none; /* for Safari */
-        -moz-appearance: none; /* for Firefox */
+        background-color: black
+        ;
+        color: white;
+     /* for Firefox */
     }
 
-        #item-type:focus {
-            outline: none;
-            border-color: #4CAF50;
-            box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.2);
-        }
+    #item-type:focus {
+        outline: none;
+        border-color: black;
+        box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.2);
+    }
+    #item-type:hover{
+            background-color: grey; /* change the background color on hover */
+            color: white;
+
+    }
 
     .row {
         display: flex;
@@ -52,7 +57,7 @@
     }
 
     th {
-        background-color: #4CAF50;
+        background-color: black;
         color: white;
     }
 
@@ -60,9 +65,66 @@
         background-color: #f2f2f2;
     }
 
+        tr:hover {
+        background-color: grey;
+    }
+
+    .myquantity {
+        margin: 0 0 0 100px;
+        width: 50%;
+        /*box-sizing: border-box;*/
+        padding: 8px;
+        font-size: 14px;
+        border-color: black;
+        border-radius: 5px;
+        background-color: #f1f1f1;
+        text-align: center;
+    }
+    .myquantity:focus {
+        outline: none;
+        background-color: #fff;
+    }
+
+/*
+    table {
+        font-family: Arial, sans-serif;
+        border-collapse: collapse;
+        width: 100%;
+    }
+
+    th, td {
+        text-align: left;
+        padding: 8px;
+        border: 1px solid #ddd;
+    }
+
+    th {
+        background-color: #4CAF50;
+        color: white;
+    }
+
+    tr:nth-child(even) {
+        background-color: #f2f2f2;
+    }*/
+
+  /*  .myquantity {
+        width: 100%;
+        box-sizing: border-box;
+        padding: 8px;
+        font-size: 14px;
+        border: none;
+        border-radius: 5px;
+        background-color: #f1f1f1;
+        text-align: center;
+    }
+
+        .myquantity:focus {
+            outline: none;
+            background-color: #fff;
+        }*/
     button {
        float:right;
-        background-color: #4CAF50; /* set the background color */
+        background-color: black; /* set the background color */
         border: none; /* remove the border */
         color: white; /* set the font color */
         padding: 15px 32px; /* set the padding */
@@ -77,7 +139,7 @@
     }
 
     button:hover {
-        background-color: #3e8e41; /* change the background color on hover */
+        background-color: grey; /* change the background color on hover */
         color: white; /* change the font color on hover */
     }
 </style>
@@ -176,6 +238,7 @@
         //        });
         //    });
         //});
+
         printBillBtn.addEventListener('click', async () => {
             var updateQuantityRequest = [];
             for (var i = 0; i < itemsToUpdate.length; i++) {
@@ -189,12 +252,12 @@
            
             const xhr = new XMLHttpRequest();
             xhr.open('PATCH', '/Home/UpdateQuantity');
-            debugger
+           
            await xhr.addEventListener('load', () => {
                 if (xhr.status === 200) {
-                    //debugger           
-                    
-                    window.location.href = "/Home";
+                    //debugger
+
+                    window.location.href = '/Home/Thanks';
                 } else {
                   
                     console.error('Error: ' + xhr.statusText);
@@ -205,29 +268,51 @@
             await xhr.send(form);
 
         });
-        async function updateQuantity2(){
-
+        function updateQuantity2() {
             const name = prompt("Please enter your name:");
             const amount = parseInt(grandTotalSpan.textContent);
             const form = new FormData();
-            //form.append('updateQuantityRequest', updateQuantityRequest);
             form.append('customerName', name);
             form.append('totalAmount', amount);
-            debugger
-            const xhr = new XMLHttpRequest();
-            xhr.open('POST', '/Home/Addbill');
-            await xhr.addEventListener('load', () => {
-                if (xhr.status === 200) {
-                  
-                    window.location.href = '/Home/Thansks';
-                } else {
-                    console.error('Error: ' + xhr.statusText);
+            
+            $.ajax({
+                url: '/Home/Addbill',
+                type: 'POST',
+                data: form,
+                processData: false,
+                contentType: false,
+                success: function (response) {
+                    window.location.href = '/Home/Thanks';
+                },
+                error: function (xhr, status, error) {
+                    console.error('Error: ' + error);
                 }
             });
-            xhr.send(form);
+        }
+
+        //async function updateQuantity2(){
+
+        //    const name = prompt("Please enter your name:");
+        //    const amount = parseInt(grandTotalSpan.textContent);
+        //    const form = new FormData();
+        //    //form.append('updateQuantityRequest', updateQuantityRequest);
+        //    form.append('customerName', name);
+        //    form.append('totalAmount', amount);
+        //    debugger
+        //    const xhr = new XMLHttpRequest();
+        //    xhr.open('POST', '/Home/Addbill');
+        //    await xhr.addEventListener('load', () => {
+        //        if (xhr.status === 200) {
+                  
+        //            window.location.href = '/Home/Thansks';
+        //        } else {
+        //            console.error('Error: ' + xhr.statusText);
+        //        }
+        //    });
+        //    xhr.send(form);
             
           
-        }
+        //}
         // initialize prices and quantities arrays
         for (var i = 0; i < quantityInputs.length; i++) {
             var price = parseFloat(quantityInputs[i].getAttribute('data-price'));
@@ -260,7 +345,7 @@
 
             grandTotalSpan.innerHTML = grandTotal.toFixed(2);
         }
-
+       
         // attach event listener to quantity input
         for (var i = 0; i < quantityInputs.length; i++) {
             quantityInputs[i].addEventListener('change', calculateTotals);

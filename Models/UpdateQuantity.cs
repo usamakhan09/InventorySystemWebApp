@@ -2,8 +2,8 @@
 {
     public class UpdateQuantity
     {
-        public string itemsName { get; set; }
-        public string itemsQuantity { get; set; }
+        public string? itemsName { get; set; }
+        public string? itemsQuantity { get; set; }
 
     }
 }
